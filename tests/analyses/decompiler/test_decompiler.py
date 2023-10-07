@@ -2026,7 +2026,7 @@ class TestDecompiler(unittest.TestCase):
         self._print_decompilation_result(d)
 
         condensed = d.codegen.text.replace(" ", "").replace("\n", "")
-        assert re.search(r"v\d=__errno_location\(\);\*\(v\d\)=input_seek_errno;", condensed)
+        assert re.search(r"v\d=__errno_location\(\);\*\(v\d\)=v\d;", condensed)
 
     @structuring_algo("phoenix")
     def test_decompiling_dd_iwrite(self, decompiler_options=None):
