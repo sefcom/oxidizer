@@ -211,3 +211,14 @@ def get_cpp_function_name(demangled_name: str) -> str:
     if func_decls and len(func_decls) == 1:
         return next(iter(func_decls))
     return normalize_cpp_function_name(demangled_name)
+
+def get_rust_function_name(demangled_name):
+    name = demangled_name
+    chunks = name.split("::")
+    name = "::".join(chunks[:-1])
+
+    # remove arguments
+    if "(" in name:
+        name = name[: name.find("(")]
+
+    return name
