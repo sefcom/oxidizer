@@ -209,3 +209,14 @@ def get_cpp_function_name(demangled_name, specialized=True, qualified=True):
         name = name[: name.find("(")]
 
     return name
+
+def get_rust_function_name(demangled_name):
+    name = demangled_name
+    chunks = name.split("::")
+    name = "::".join(chunks[:-1])
+
+    # remove arguments
+    if "(" in name:
+        name = name[: name.find("(")]
+
+    return name
