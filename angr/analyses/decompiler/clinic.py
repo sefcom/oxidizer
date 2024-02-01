@@ -52,6 +52,8 @@ from .optimization_passes import (
     DUPLICATING_OPTS,
     CONDENSING_OPTS,
 )
+from .utils import first_nonlabel_statement_id
+from ..typehoon import Typehoon
 
 if TYPE_CHECKING:
     from angr.knowledge_plugins.cfg import CFGModel
@@ -145,6 +147,7 @@ class Clinic(Analysis):
         force_loop_single_exit: bool = True,
         refine_loops_with_single_successor: bool = False,
         complete_successors: bool = False,
+        typehoon_cls=Typehoon,
         max_type_constraints: int = 100_000,
         type_constraint_set_degradation_threshold: int = 150,
         ail_graph: networkx.DiGraph | None = None,
@@ -195,6 +198,7 @@ class Clinic(Analysis):
         # during SSA conversion, we create secondary stack variables because they overlap and are larger than the
         # actual stack variables. these secondary stack variables can be safely eliminated if not used by anything.
         self.secondary_stackvars: set[int] = set()
+        self._typehoon_cls = typehoon_cls
 
         self.notes = notes if notes is not None else {}
 
@@ -1890,10 +1894,9 @@ class Clinic(Analysis):
             )
         else:
             try:
-                tp = self.project.analyses.Typehoon(
+                tp = self.project.analyses[self._typehoon_cls].prep(kb=tmp_kb)(
                     vr.type_constraints,
                     vr.func_typevar,
-                    kb=tmp_kb,
                     fail_fast=self._fail_fast,
                     var_mapping=vr.var_to_typevars,
                     stack_offset_tvs=vr.stack_offset_typevars,
