@@ -33,7 +33,7 @@ def get_function_name(s):
                 "declaration string."
             )
 
-        s = s[s.index("))") + 2 :].strip()
+        s = s[s.index("))") + 2:].strip()
 
     if "(" not in s:
         raise ValueError("Cannot find any left parenthesis in the function declaration string.")
@@ -231,10 +231,12 @@ def get_cpp_function_name(demangled_name: str) -> str:
     """
     return get_cpp_function_name_and_metadata(demangled_name)[0]
 
+
 def get_rust_function_name(demangled_name):
     name = demangled_name
     chunks = name.split("::")
-    name = "::".join(chunks[:-1])
+    if len(chunks) > 1:
+        name = "::".join(chunks[:-1])
 
     # remove arguments
     if "(" in name:
