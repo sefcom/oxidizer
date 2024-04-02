@@ -52,15 +52,6 @@ _PEEPHOLE_OPTIMIZATIONS_TYPE = (
 )
 
 
-class TargetLanguage(Enum):
-    C = "C"
-    RUST = "Rust"
-
-
-CodeGenCls = {TargetLanguage.C: CStructuredCodeGenerator, TargetLanguage.RUST: RustStructuredCodeGenerator}
-TypehoonCls = {TargetLanguage.C: Typehoon, TargetLanguage.RUST: RustTypehoon}
-
-
 class Decompiler(Analysis):
     """
     The decompiler analysis.
@@ -102,9 +93,7 @@ class Decompiler(Analysis):
         static_vvars: dict | None = None,
         static_buffers: dict | None = None,
         codegen_cls=CStructuredCodeGenerator,
-        target_lang=TargetLanguage.RUST,
     ):
-        assert target_lang in TargetLanguage
         if not isinstance(func, Function):
             func = self.kb.functions[func]
         self.func: Function = func
@@ -174,7 +163,6 @@ class Decompiler(Analysis):
             if use_cache
             else None
         )
-        self._target_lang = target_lang
 
         self.clinic = None  # mostly for debugging purposes
         self._clinic_graph = clinic_graph
@@ -196,6 +184,15 @@ class Decompiler(Analysis):
         self.expr_collapse_depth = expr_collapse_depth
         self.notes: dict[str, DecompilationNote] = {}
         self.region_identifier = None
+
+        self._codegen_cls = CStructuredCodeGenerator
+        self._typehoon_cls = Typehoon
+        if self.project.is_rust_binary:
+            self._codegen_cls = RustStructuredCodeGenerator
+            self._typehoon_cls = RustTypehoon
+            self._peephole_optimizations = STMT_OPTS + EXPR_OPTS + MULTI_STMT_OPTS
+            self._peephole_optimizations.remove(InlinedStrcpy)
+            self._peephole_optimizations.remove(InlinedStrcpyConsolidation)
 
         if decompile:
             with self._resilience():
@@ -310,10 +307,6 @@ class Decompiler(Analysis):
             return self._update_progress(p * (70 - 5) / 100.0 + 5, **kwargs)
 
         if self._regen_clinic or old_clinic is None or self.func.prototype is None:
-            if self._target_lang == TargetLanguage.RUST:
-                self._peephole_optimizations = STMT_OPTS + EXPR_OPTS + MULTI_STMT_OPTS
-                self._peephole_optimizations.remove(InlinedStrcpy)
-                self._peephole_optimizations.remove(InlinedStrcpyConsolidation)
             clinic = self.project.analyses.Clinic(
                 self.func,
                 kb=self.kb,
@@ -334,7 +327,7 @@ class Decompiler(Analysis):
                 force_loop_single_exit=self._force_loop_single_exit,
                 refine_loops_with_single_successor=self._refine_loops_with_single_successor,
                 complete_successors=self._complete_successors,
-                typehoon_cls=TypehoonCls[self._target_lang],
+                typehoon_cls=self._typehoon_cls,
                 ail_graph=self._clinic_graph,
                 arg_vvars=self._clinic_arg_vvars,
                 start_stage=self._clinic_start_stage,
