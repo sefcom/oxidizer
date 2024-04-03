@@ -32,6 +32,7 @@ class InlinedStrcpy(PeepholeOptimizationStmtBase):
             and stmt.dst.was_stack
             and isinstance(stmt.src, Const)
             and isinstance(stmt.src.value, int)
+            and not self.project.is_rust_binary
         ):
             r, s = self.is_integer_likely_a_string(stmt.src.value, stmt.src.size, self.project.arch.memory_endness)
             if r:
