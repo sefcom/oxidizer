@@ -21,7 +21,7 @@ class InlinedStrcpyConsolidation(PeepholeOptimizationMultiStmtBase):
 
     def optimize(self, stmts: list[Call], **kwargs):
         last_stmt, stmt = stmts
-        if InlinedStrcpy.is_inlined_strcpy(last_stmt):
+        if InlinedStrcpy.is_inlined_strcpy(last_stmt) and not self.project.is_rust_binary:
             s_last: bytes = self.kb.custom_strings[last_stmt.args[1].value]
             addr_last = last_stmt.args[0]
             new_str = None  # will be set if consolidation should happen
