@@ -119,7 +119,7 @@ class Project:
         analyses_preset=None,
         concrete_target=None,
         eager_ifunc_resolution=None,
-        is_rust_binary=False,
+        is_rust_binary=True,
         **kwargs,
     ):
         self.is_rust_binary = is_rust_binary
