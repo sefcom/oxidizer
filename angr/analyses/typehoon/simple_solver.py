@@ -1563,7 +1563,7 @@ class SimpleSolver:
                     sol = elem_type if array_size == elem_size else Array(elem_type, array_size // elem_size)
                 fields[offset] = sol
 
-            if not fields:
+            if not fields or any(field is None for field in fields.values()):
                 result = Top_
                 for node in nodes:
                     self._solution_cache[node.typevar] = result
