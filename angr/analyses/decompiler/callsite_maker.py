@@ -230,6 +230,12 @@ class CallSiteMaker(Analysis):
                     stack_arg_locs.append(arg_loc)
                     _, the_arg = self._resolve_stack_argument(call_stmt, arg_loc)
                     arg_expr = the_arg if the_arg is not None else None
+                elif isinstance(arg_loc, SimStructArg):
+                    arg_expr = None
+                    l.warning("SimStructArg is not yet supported")
+                elif isinstance(arg_loc, SimComboArg):
+                    arg_expr = None
+                    l.warning("SimComboArg is not yet supported")
                 else:
                     assert False, "Unreachable"
 
