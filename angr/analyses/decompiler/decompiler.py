@@ -386,7 +386,7 @@ class Decompiler(Analysis):
                 self.find_data_references_and_update_memory_data(seq_node)
 
             self._update_progress(85.0, text="Generating code")
-            codegen = self.project.analyses[self.codegen_cls].prep(kb=self.kb)(
+            codegen = self.project.analyses[self._codegen_cls].prep(kb=self.kb)(
                 self.func,
                 seq_node,
                 cfg=self._cfg,
