@@ -56,6 +56,7 @@ from ..typehoon import Typehoon
 from .optimization_passes import get_optimization_passes, OptimizationPassStage, RegisterSaveAreaSimplifier
 from ..typehoon.typehoon import Typehoon
 from ...rust.ailment.expression import Struct, Array, Let
+from ...rust.ailment.statement import FunctionLikeMacro
 from ...rust.typehoon.typehoon import RustTypehoon
 from ...rust.sim_type import RustSimTypeInt
 
@@ -2049,6 +2050,9 @@ class Clinic(Analysis):
                 assert isinstance(stmt, ailment.Stmt.Return)
                 self._link_variables_on_return(variable_manager, global_variables, block, stmt_idx, stmt)
 
+            elif stmt_type is FunctionLikeMacro:
+                self._link_variables_on_expr(variable_manager, global_variables, block, stmt_idx, stmt, stmt)
+
     def _link_variables_on_return(
         self, variable_manager, global_variables, block: ailment.Block, stmt_idx: int, stmt: ailment.Stmt.Return
     ):
@@ -2240,6 +2244,10 @@ class Clinic(Analysis):
 
         elif isinstance(expr, Let):
             self._link_variables_on_expr(variable_manager, global_variables, block, stmt_idx, stmt, expr.src)
+
+        elif isinstance(expr, FunctionLikeMacro):
+            for arg in expr.args:
+                self._link_variables_on_expr(variable_manager, global_variables, block, stmt_idx, stmt, arg)
 
     def _map_stackvar_to_struct_member(
         self,
