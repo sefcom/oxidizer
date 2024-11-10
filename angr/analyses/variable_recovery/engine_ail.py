@@ -14,6 +14,7 @@ from angr.sim_type import SimTypeFunction
 from angr.analyses.typehoon import typeconsts, typevars
 from angr.analyses.typehoon.lifter import TypeLifter
 from angr.utils.types import dereference_simtype_by_lib
+from ...rust.ailment.statement import FunctionLikeMacro
 from ...rust.sim_type import RustSimTypeStr, RustSimTypeString, RustSimTypeFunction
 from ...rust.ailment.expression import String, Struct, Array, Let
 from ...rust.sim_type import RustSimTypeFunction, RustSimStruct, RustSimTypeStr, RustSimTypeReference
@@ -479,6 +480,10 @@ class SimEngineVRAIL(
 
     def _handle_expr_Let(self, expr: Let):
         self._expr(expr.src)
+
+    def _handle_expr_FunctionLikeMacro(self, expr: FunctionLikeMacro):
+        for arg in expr.args:
+            self._expr(arg)
 
     def _handle_expr_Const(self, expr: ailment.Expr.Const):
         return self._get_const(expr.value, expr.bits, expr=expr)
