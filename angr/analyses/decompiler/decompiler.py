@@ -386,14 +386,13 @@ class Decompiler(Analysis):
                 self.find_data_references_and_update_memory_data(seq_node)
 
             self._update_progress(85.0, text="Generating code")
-            codegen = self.project.analyses[self._codegen_cls].prep(kb=self.kb)(
+            codegen = self.project.analyses[self._codegen_cls].prep(kb=self.kb, fail_fast=self._fail_fast)(
                 self.func,
                 seq_node,
                 cfg=self._cfg,
                 ail_graph=clinic.graph,
                 flavor=self._flavor,
                 func_args=clinic.arg_list,
-                fail_fast=self._fail_fast,
                 variable_kb=clinic.variable_kb,
                 expr_comments=old_codegen.expr_comments if old_codegen is not None else None,
                 stmt_comments=old_codegen.stmt_comments if old_codegen is not None else None,
