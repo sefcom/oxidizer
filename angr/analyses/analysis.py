@@ -312,17 +312,16 @@ class Analysis:
         try:
             yield
         except exception:  # pylint:disable=broad-except
-            if self._fail_fast:
-                raise
-            else:
-                error = AnalysisLogEntry("exception occurred", exc_info=True)
-                l.error(
-                    "Caught and logged %s with resilience: %s", error.exc_type.__name__, error.exc_value  # type:ignore
-                )
-                if name is None:
-                    self.errors.append(error)
-                else:
-                    self.named_errors[name].append(error)
+            raise
+            # if self._fail_fast:
+            #     raise
+            # else:
+            #     error = AnalysisLogEntry("exception occurred", exc_info=True)
+            #     l.error("Caught and logged %s with resilience: %s", error.exc_type.__name__, error.exc_value)
+            #     if name is None:
+            #         self.errors.append(error)
+            #     else:
+            #         self.named_errors[name].append(error)
 
     def _initialize_progressbar(self):
         """
