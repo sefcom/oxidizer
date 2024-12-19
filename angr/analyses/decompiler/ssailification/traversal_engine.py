@@ -13,7 +13,9 @@ from angr.ailment.expression import (
     Load,
 )
 
+from angr.engines.engine import DataType_co
 from angr.engines.light import SimEngineLightAIL
+from angr.engines.light.engine import StmtDataType
 from angr.project import Project
 from angr.utils.ssa import get_reg_offset_base
 from angr.utils.orderedset import OrderedSet
@@ -55,6 +57,10 @@ class SimEngineSSATraversal(SimEngineLightAIL[TraversalState, None, None, None])
 
     def _process_block_end(self, block, stmt_data, whitelist):
         pass
+
+    def _handle_stmt_FunctionLikeMacro(self, stmt):
+        for arg in stmt.args:
+            self._expr(arg)
 
     def _handle_stmt_Assignment(self, stmt):
         if isinstance(stmt.dst, Register):
@@ -207,6 +213,24 @@ class SimEngineSSATraversal(SimEngineLightAIL[TraversalState, None, None, None])
             self.loc_to_defs[codeloc].add(expr)
 
             self.state.live_tmps.add(expr.tmp_idx)
+
+    def _handle_expr_Array(self, expr):
+        for element in expr.elements:
+            self._expr(element)
+
+    def _handle_expr_Struct(self, expr):
+        for field in expr.fields.values():
+            self._expr(field)
+
+    def _handle_expr_String(self, expr):
+        pass
+
+    def _handle_expr_Let(self, expr):
+        pass
+
+    def _handle_expr_FunctionLikeMacro(self, expr):
+        for arg in expr.args:
+            self._expr(arg)
 
     def _handle_binop_Default(self, expr: BinaryOp):
         self._expr(expr.operands[0])
