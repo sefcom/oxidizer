@@ -35,7 +35,8 @@ from .structuring.structurer_nodes import (
     IncompleteSwitchCaseNode,
 )
 from .graph_region import GraphRegion
-from .utils import peephole_optimize_expr
+from .utils import first_nonlabel_nonphi_statement, peephole_optimize_expr
+from ...rust.ailment.expression import StringLiteral
 
 if is_pyinstaller():
     # PyInstaller is not happy with lazy import
@@ -853,7 +854,7 @@ class ConditionProcessor:
 
         if isinstance(
             condition,
-            (ailment.Expr.VEXCCallExpression, ailment.Expr.BasePointerOffset, ailment.Expr.ITE),
+            (ailment.Expr.VEXCCallExpression, ailment.Expr.BasePointerOffset, ailment.Expr.ITE, StringLiteral),
         ):
             return _dummy_bvs(condition, self._condition_mapping)
         if isinstance(condition, ailment.Stmt.Call):
