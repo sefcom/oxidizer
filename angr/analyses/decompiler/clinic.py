@@ -1913,10 +1913,9 @@ class Clinic(Analysis):
             )
         else:
             try:
-                tp = self.project.analyses[self._typehoon_cls].prep(kb=tmp_kb)(
+                tp = self.project.analyses[self._typehoon_cls].prep(kb=tmp_kb, fail_fast=self._fail_fast)(
                     vr.type_constraints,
                     vr.func_typevar,
-                    fail_fast=self._fail_fast,
                     var_mapping=vr.var_to_typevars,
                     stack_offset_tvs=vr.stack_offset_typevars,
                     must_struct=must_struct,
