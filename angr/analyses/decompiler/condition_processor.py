@@ -10,7 +10,7 @@ import angr.ailment as ailment
 import claripy
 import networkx
 from unique_log_filter import UniqueLogFilter
-
+from ailment.expression import StringLiteral
 
 from angr.utils.graph import GraphUtils
 from angr.utils.lazy_import import lazy_import
@@ -36,7 +36,6 @@ from .structuring.structurer_nodes import (
 )
 from .graph_region import GraphRegion
 from .utils import first_nonlabel_nonphi_statement, peephole_optimize_expr
-from ...rust.ailment.expression import StringLiteral
 
 if is_pyinstaller():
     # PyInstaller is not happy with lazy import
