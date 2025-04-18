@@ -150,6 +150,9 @@ class CallSiteMaker(Analysis):
                     ]
                 elif isinstance(arg_loc, (SimRegArg, SimStackArg, SimReferenceArgument)):
                     expanded_arg_locs.append(arg_loc)
+                elif isinstance(arg_loc, SimStructArg):
+                    for field_name in arg_loc.struct.fields.keys():
+                        expanded_arg_locs.append(arg_loc.locs[field_name])
                 else:
                     raise NotImplementedError("Not implemented yet.")
 
