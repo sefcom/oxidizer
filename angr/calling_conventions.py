@@ -37,6 +37,7 @@ from .sim_type import (
     SimTypeRef,
 )
 from .state_plugins.sim_action_object import SimActionObject
+from .rust.sim_type import RustSimEnum
 
 l = logging.getLogger(name=__name__)
 l.addFilter(UniqueLogFilter())
@@ -1643,6 +1644,8 @@ class SimCCSystemVAMD64(SimCC):
             return None
         if ty._arch is None:
             ty = ty.with_arch(self.arch)
+        if isinstance(ty, RustSimEnum):
+            ty = ty.as_struct_ty()
         classification = self._classify(ty)
         if any(cls == "MEMORY" for cls in classification):
             assert all(cls == "MEMORY" for cls in classification)
