@@ -16,7 +16,13 @@ from angr.utils.ail import is_phi_assignment
 from angr.utils.types import unpack_pointer, replace_pointer_pts_to
 from angr.protos import variables_pb2
 from angr.serializable import Serializable
-from angr.sim_variable import SimVariable, SimStackVariable, SimMemoryVariable, SimRegisterVariable
+from angr.sim_variable import (
+    SimVariable,
+    SimStackVariable,
+    SimMemoryVariable,
+    SimRegisterVariable,
+    SimComboRegisterVariable,
+)
 from angr.sim_type import (
     TypeRef,
     SimType,
@@ -938,6 +944,7 @@ class VariableManagerInternal(Serializable):
 
         sorted_stack_variables = []
         sorted_reg_variables = []
+        sorted_combo_reg_variables = []
         arg_vars = []
 
         for var in self._unified_variables:
@@ -952,6 +959,12 @@ class VariableManagerInternal(Serializable):
                     arg_vars.append(var)
                 else:
                     sorted_reg_variables.append(var)
+
+            elif isinstance(var, SimComboRegisterVariable):
+                if var.ident and var.ident.startswith("arg_"):
+                    arg_vars.append(var)
+                else:
+                    sorted_combo_reg_variables.append(var)
 
             elif isinstance(var, SimMemoryVariable):
                 if not reset and var.name is not None:
@@ -985,11 +998,11 @@ class VariableManagerInternal(Serializable):
                     sorted_reg_variables.remove(var)
                     phi_only_vars.append(var)
 
-        for var in chain(sorted_stack_variables, sorted_reg_variables, phi_only_vars):
+        for var in chain(sorted_stack_variables, sorted_reg_variables, sorted_combo_reg_variables, phi_only_vars):
             idx = next(var_ctr)
             if var.name is not None and var.name != var.ident and not reset:
                 continue
-            if isinstance(var, (SimStackVariable, SimRegisterVariable)):
+            if isinstance(var, (SimStackVariable, SimRegisterVariable, SimComboRegisterVariable)):
                 var.name = f"v{idx}"
             # clear the hash cache
             var._hash = None
@@ -1085,6 +1098,7 @@ class VariableManagerInternal(Serializable):
 
         stack_vars: set[SimStackVariable] = set()
         reg_vars: set[SimRegisterVariable] = set()
+        combo_reg_vars: set[SimComboRegisterVariable] = set()
 
         # unify stack variables based on their locations
         for v in self.get_variables() + list(self._phi_variables):
@@ -1095,6 +1109,8 @@ class VariableManagerInternal(Serializable):
                 stack_vars.add(v)
             elif isinstance(v, SimRegisterVariable):
                 reg_vars.add(v)
+            elif isinstance(v, SimComboRegisterVariable):
+                combo_reg_vars.add(v)
 
         # unify variables based on phi nodes
         graph = networkx.DiGraph()  # an edge v1 -> v2 means v2 is the phi variable for v1
@@ -1132,9 +1148,13 @@ class VariableManagerInternal(Serializable):
             for v in nodes:
                 reg_vars.discard(v)
                 stack_vars.discard(v)
+                combo_reg_vars.discard(v)
 
         # deal with remaining variables
         for v in sorted(reg_vars, key=lambda v: v.ident if v.ident else ""):
+            self.set_unified_variable(v, v)
+
+        for v in sorted(combo_reg_vars, key=lambda v: v.ident):
             self.set_unified_variable(v, v)
 
         if interference is None:
