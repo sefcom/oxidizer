@@ -34,6 +34,7 @@ from angr.ailment.expression import (
     BinaryOp,
     VirtualVariable,
     UnaryOp,
+    ComboRegister,
 )
 
 from angr.analyses.s_propagator import SPropagatorAnalysis
@@ -1920,7 +1921,7 @@ class AILSimplifier(Analysis):
                         if (
                             isinstance(stmt, Assignment)
                             and isinstance(stmt.dst, VirtualVariable)
-                            and stmt.dst.varid in self._avoid_vvar_ids
+                            and (stmt.dst.varid in self._avoid_vvar_ids or stmt.dst.was_combo_reg)
                         ):
                             new_statements.append(stmt)
                             continue
@@ -1960,7 +1961,9 @@ class AILSimplifier(Analysis):
                             simplified = True
                             continue
 
-                        if stmt.ret_expr is not None or stmt.fp_ret_expr is not None:
+                        if (stmt.ret_expr is not None or stmt.fp_ret_expr is not None) and not (
+                            isinstance(stmt.ret_expr, VirtualVariable) and stmt.ret_expr.was_combo_reg
+                        ):
                             # both the return expr and the fp_ret_expr are not used
                             stmt = stmt.copy()
                             stmt.ret_expr = None
