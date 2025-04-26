@@ -35,6 +35,7 @@ from angr.ailment.expression import (
     Tmp,
     DirtyExpression,
     Reinterpret,
+    ComboRegister,
 )
 
 from angr.knowledge_plugins.key_definitions import atoms
@@ -88,6 +89,7 @@ class SimEngineSSARewriting(
         self.secondary_stackvars: set[int] = set()
 
         self._current_vvar_id = vvar_id_start
+        self._varid_to_combo_reg = {}
 
     @property
     def current_vvar_id(self) -> int:
@@ -359,12 +361,19 @@ class SimEngineSSARewriting(
                 self._clear_aliasing_regs(base_off, base_size)
                 self.state.registers[base_off][base_size] = None
 
-        if new_ret_expr is not None and isinstance(stmt.ret_expr, Register):
-            base_off, base_size = get_reg_offset_base_and_size(
-                stmt.ret_expr.reg_offset, self.arch, size=stmt.ret_expr.size
-            )
-            self._clear_aliasing_regs(base_off, base_size)
-            self.state.registers[base_off][base_size] = new_ret_expr
+        if new_ret_expr is not None:
+            ret_exprs = []
+            new_sub_ret_exprs = []
+            if isinstance(stmt.ret_expr, Register):
+                ret_exprs.append(stmt.ret_expr)
+                new_sub_ret_exprs.append(new_ret_expr)
+            elif isinstance(stmt.ret_expr, ComboRegister):
+                ret_exprs.extend(stmt.ret_expr.registers)
+                new_sub_ret_exprs.extend(new_ret_expr.reg_vvars)
+            for ret_expr, new_sub_ret_expr in zip(ret_exprs, new_sub_ret_exprs):
+                base_off, base_size = get_reg_offset_base_and_size(ret_expr.reg_offset, self.arch, size=ret_expr.size)
+                self._clear_aliasing_regs(base_off, base_size)
+                self.state.registers[base_off][base_size] = new_sub_ret_expr
         if new_fp_ret_expr is not None and isinstance(stmt.fp_ret_expr, Register):
             self._clear_aliasing_regs(stmt.fp_ret_expr.reg_offset, stmt.fp_ret_expr.size)
             self.state.registers[stmt.fp_ret_expr.reg_offset][stmt.fp_ret_expr.size] = new_fp_ret_expr
@@ -706,7 +715,26 @@ class SimEngineSSARewriting(
             return self._replace_def_store(block_addr, block_idx, stmt_idx, thing)
         if isinstance(thing, Tmp) and self.rewrite_tmps:
             return self._replace_def_tmp(block_addr, block_idx, stmt_idx, thing)
+        if isinstance(thing, ComboRegister):
+            return self._replace_def_combo_reg(block_addr, block_idx, stmt_idx, thing)
         return None
+
+    def _replace_def_combo_reg(
+        self, block_addr: int, block_idx: int | None, stmt_idx: int, expr: ComboRegister
+    ) -> VirtualVariable:
+        vvid = self.next_vvar_id()
+        result = VirtualVariable(
+            expr.idx,
+            vvid,
+            expr.bits,
+            VirtualVariableCategory.COMBO_REGISTER,
+            oident=tuple(reg.reg_offset for reg in expr.registers),
+            reg_vvars=[self._replace_def_reg(block_addr, block_idx, stmt_idx, reg) for reg in expr.registers],
+            **expr.tags,
+        )
+        for reg_vvar in result.reg_vvars:
+            self._varid_to_combo_reg[reg_vvar.varid] = result
+        return result
 
     def _replace_def_reg(
         self, block_addr: int, block_idx: int | None, stmt_idx: int, expr: Register
