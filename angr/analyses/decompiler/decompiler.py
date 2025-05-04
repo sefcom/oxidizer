@@ -371,6 +371,7 @@ class Decompiler(Analysis):
                 arg_vvars=set(self.clinic.arg_vvars),
                 kb=self.kb,
                 fail_fast=self._fail_fast,
+                simplify_ifelse=not self.project.is_rust_binary,
                 **self.options_to_params(self.options_by_class["region_simplifier"]),
             )
             seq_node = s.result
