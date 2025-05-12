@@ -393,7 +393,8 @@ class SimEngineVRAIL(
     def _handle_expr_FunctionLikeMacro(self, expr: FunctionLikeMacro):
         for arg in expr.args:
             self._expr(arg)
-        return RichR(self.state.top(expr.bits))
+        ret_ty = typevars.TypeVariable()
+        return RichR(self.state.top(expr.bits), typevar=ret_ty)
 
     def _handle_expr_Const(self, expr: ailment.Expr.Const):
         if isinstance(expr.value, float):
