@@ -36,7 +36,13 @@ from angr.sim_type import (
     SimTypePointer,
 )
 from angr.analyses.stack_pointer_tracker import Register, OffsetVal
-from angr.sim_variable import SimVariable, SimStackVariable, SimRegisterVariable, SimMemoryVariable
+from angr.sim_variable import (
+    SimVariable,
+    SimStackVariable,
+    SimRegisterVariable,
+    SimMemoryVariable,
+    SimComboRegisterVariable,
+)
 from angr.procedures.stubs.UnresolvableCallTarget import UnresolvableCallTarget
 from angr.procedures.stubs.UnresolvableJumpTarget import UnresolvableJumpTarget
 from angr.analyses import Analysis, register_analysis
@@ -1945,7 +1951,7 @@ class Clinic(Analysis):
                     {
                         v: t
                         for v, t in vr.var_to_typevars.items()
-                        if isinstance(v, (SimRegisterVariable, SimStackVariable))
+                        if isinstance(v, (SimRegisterVariable, SimStackVariable, SimComboRegisterVariable))
                     },
                     vr.stack_offset_typevars,
                 )
