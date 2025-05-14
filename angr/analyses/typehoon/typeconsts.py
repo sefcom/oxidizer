@@ -49,11 +49,15 @@ class TypeConstant:
 
 
 class TopType(TypeConstant):
+    SIZE = 1
+
     def __repr__(self, memo=None):
         return "TOP"
 
 
 class BottomType(TypeConstant):
+    SIZE = 1
+
     def __repr__(self, memo=None):
         return "BOT"
 
