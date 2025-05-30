@@ -10,8 +10,8 @@ import angr.ailment as ailment
 import claripy
 import networkx
 from unique_log_filter import UniqueLogFilter
-from ailment.expression import StringLiteral
 
+from angr.ailment.expression import StringLiteral
 from angr.utils.graph import GraphUtils
 from angr.utils.lazy_import import lazy_import
 from angr.utils import is_pyinstaller
