@@ -10,8 +10,8 @@ import angr.ailment as ailment
 import claripy
 import networkx
 from unique_log_filter import UniqueLogFilter
-from ailment.expression import StringLiteral
 
+from angr.ailment.expression import StringLiteral
 from angr.utils.graph import GraphUtils
 from angr.utils.graph import dominates, inverted_idoms
 from angr.utils.ail import is_head_controlled_loop_block
