@@ -8,13 +8,13 @@ from angr.ailment.constant import UNDETERMINED_SIZE
 import claripy
 from unique_log_filter import UniqueLogFilter
 
-from ailment.expression import StringLiteral, Struct, Array, Enum, Let
+from angr.ailment.expression import StringLiteral, Struct, Array, Enum, Let
 from angr.engines.light.engine import SimEngineNostmtAIL
 from angr.sim_type import SimTypeFunction
 from angr.analyses.typehoon import typeconsts, typevars
 from angr.analyses.typehoon.lifter import TypeLifter
 from angr.utils.types import dereference_simtype_by_lib
-from ailment.statement import FunctionLikeMacro
+from angr.ailment.statement import FunctionLikeMacro
 from .engine_base import SimEngineVRBase, RichR
 
 if TYPE_CHECKING:
