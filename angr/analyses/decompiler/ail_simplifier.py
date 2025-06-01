@@ -10,7 +10,16 @@ import networkx
 
 from angr.ailment import AILBlockWalker
 from angr.ailment.block import Block
-from angr.ailment.statement import Statement, Assignment, Store, Call, ConditionalJump, DirtyStatement, WeakAssignment
+from angr.ailment.statement import (
+    Statement,
+    Assignment,
+    Store,
+    Call,
+    ConditionalJump,
+    DirtyStatement,
+    WeakAssignment,
+    FunctionLikeMacro,
+)
 from angr.ailment.expression import (
     Register,
     Convert,
@@ -1730,10 +1739,12 @@ class AILSimplifier(Analysis):
                             if isinstance(stmt, Assignment) and isinstance(stmt.dst, VirtualVariable):
                                 # no one is using the returned virtual variable.
                                 # now the things are a bit tricky here
-                                if isinstance(stmt.src, Call):
+                                if isinstance(stmt.src, (Call, FunctionLikeMacro)):
                                     # replace this assignment statement with a call statement
                                     stmt = stmt.src
-                                elif isinstance(stmt.src, Convert) and isinstance(stmt.src.operand, Call):
+                                elif isinstance(stmt.src, Convert) and isinstance(
+                                    stmt.src.operand, (Call, FunctionLikeMacro)
+                                ):
                                     # the convert is useless now
                                     stmt = stmt.src.operand
                                 else:
@@ -1917,8 +1928,12 @@ class AILSimplifier(Analysis):
         def _handle_callexpr(expr_idx, expr, stmt_idx, stmt, block):  # pylint:disable=unused-argument
             raise HasCallNotification
 
+        def _handle_macroexpr(expr_idx, expr, stmt_idx, stmt, block):
+            raise HasCallNotification
+
         walker = AILBlockWalker()
         walker.expr_handlers[Call] = _handle_callexpr
+        walker.expr_handlers[FunctionLikeMacro] = _handle_macroexpr
         try:
             walker.walk_statement(stmt)
         except HasCallNotification:
