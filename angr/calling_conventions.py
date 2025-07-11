@@ -1728,9 +1728,9 @@ class SimCCSystemVAMD64(SimCC):
                 if result[i] == "SSEUP" and result[i - 1] not in ("SSE", "SSEUP"):
                     result[i] = "SSE"
             return result
-        import ipdb
-
-        ipdb.set_trace()
+        # import ipdb
+        #
+        # ipdb.set_trace()
         raise NotImplementedError("Ummmmm... not sure what goes here. report bug to @rhelmot")
 
     def _flatten(self, ty) -> dict[int, list[SimType]] | None:
