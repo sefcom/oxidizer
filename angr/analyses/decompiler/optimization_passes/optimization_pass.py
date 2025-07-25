@@ -138,7 +138,7 @@ class OptimizationPass(BaseOptimizationPass):
         force_loop_single_exit: bool = True,
         complete_successors: bool = False,
         avoid_vvar_ids: set[int] | None = None,
-        arg_vvars: set[int] | None = None,
+        arg_vvars: dict[int, Any] | None = None,
         peephole_optimizations=None,
         stack_pointer_tracker=None,
         **kwargs,
