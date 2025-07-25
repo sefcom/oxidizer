@@ -290,7 +290,8 @@ class SimEngineSSARewriting(
                         existing_full_vvar, stmt.addr.offset, full_size, vvar, stmt.addr.offset, stmt.size
                     )
                     full_assignment = Assignment(stmt.idx, vvar_full, full_data, **stmt.tags)
-                    return vvar_assignment, full_assignment
+                    # return vvar_assignment, full_assignment
+                    return vvar_assignment
                 return vvar_assignment
 
         # fall back to Store

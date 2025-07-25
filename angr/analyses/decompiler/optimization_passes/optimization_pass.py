@@ -139,7 +139,7 @@ class OptimizationPass(BaseOptimizationPass):
         refine_loops_with_single_successor: bool = False,
         complete_successors: bool = False,
         avoid_vvar_ids: set[int] | None = None,
-        arg_vvars: set[int] | None = None,
+        arg_vvars: dict[int, Any] | None = None,
         peephole_optimizations=None,
         stack_pointer_tracker=None,
         notes: dict | None = None,
