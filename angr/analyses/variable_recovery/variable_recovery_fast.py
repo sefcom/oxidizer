@@ -19,7 +19,13 @@ from angr.block import Block
 from angr.errors import AngrVariableRecoveryError, SimEngineError
 from angr.knowledge_plugins import Function
 from angr.knowledge_plugins.key_definitions import atoms
-from angr.sim_variable import SimStackVariable, SimRegisterVariable, SimVariable, SimMemoryVariable
+from angr.sim_variable import (
+    SimStackVariable,
+    SimRegisterVariable,
+    SimVariable,
+    SimMemoryVariable,
+    SimComboRegisterVariable,
+)
 from angr.engines.vex.claripy.irop import vexop_to_simop
 from angr.analyses import ForwardAnalysis, visitors
 from angr.analyses.typehoon.typevars import Equivalence, TypeVariable, TypeVariables, Subtype, DerivedTypeVariable
@@ -427,6 +433,14 @@ class VariableRecoveryFast(ForwardAnalysis, VariableRecoveryBase):  # pylint:dis
                         arg_vvar_id = self.vvar_to_vvar.get(arg_vvar_id, arg_vvar_id)
                     self._ail_engine.vvar_region[arg_vvar_id] = v
                     internal_manager.add_variable("stack", arg.offset, arg)
+                elif isinstance(arg, SimComboRegisterVariable):
+                    v = claripy.BVS("combo_reg_arg", arg.bits)
+                    v = state.annotate_with_variables(v, [(0, arg)])
+                    arg_vvar_id = arg_vvar.varid
+                    if self.vvar_to_vvar:
+                        arg_vvar_id = self.vvar_to_vvar.get(arg_vvar_id, arg_vvar_id)
+                    self._ail_engine.vvar_region[arg_vvar_id] = v
+                    internal_manager.add_variable("register", arg.reg_offsets[0], arg)
                 else:
                     raise TypeError(f"Unsupported function argument type {type(arg)}")
         elif self._func_args:
