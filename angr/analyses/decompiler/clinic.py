@@ -656,7 +656,7 @@ class Clinic(Analysis):
         # Run simplification passes
         self._update_progress(49.0, text="Running simplifications 1.5")
         self._ail_graph = self._run_simplification_passes(
-            self._ail_graph, stage=OptimizationPassStage.AFTER_SSA_LEVEL1_TRANSFORMATION
+            self._ail_graph, stage=OptimizationPassStage.AFTER_SSA_LEVEL1_TRANSFORMATION, arg_vvars=self.arg_vvars
         )
 
         # register save area has been removed at this point - we should no longer use callee-saved registers in RDA
@@ -1646,7 +1646,6 @@ class Clinic(Analysis):
                 complete_successors=self._complete_successors,
                 stack_pointer_tracker=stack_pointer_tracker,
                 notes=self.notes,
-                arg_vvars=self.arg_vvars,
                 **kwargs,
             )
             if a.out_graph:
