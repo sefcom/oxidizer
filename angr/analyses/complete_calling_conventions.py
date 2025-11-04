@@ -67,6 +67,7 @@ class CompleteCallingConventionsAnalysis(Analysis):
         skip_other_funcs: bool = False,
         auto_start: bool = True,
         func_graphs: dict[int, networkx.DiGraph] | None = None,
+        target_functions: set[int] | None = None,
     ):
         """
 
@@ -101,6 +102,7 @@ class CompleteCallingConventionsAnalysis(Analysis):
         self._auto_start = auto_start
         self._total_funcs = None
         self._func_graphs = func_graphs if func_graphs else {}
+        self._target_functions = target_functions
         self.prototype_libnames: set[str] = set()
 
         # sanity check
@@ -148,6 +150,9 @@ class CompleteCallingConventionsAnalysis(Analysis):
 
         total_funcs = 0
         for func_addr in reversed(sorted_funcs):
+            if self._target_functions is not None and func_addr not in self._target_functions:
+                continue
+
             func = self.kb.functions.get_by_addr(func_addr)
             if (func.calling_convention is None or func.prototype is None) or self._force:
                 if func.is_alignment:
@@ -397,12 +402,15 @@ class CompleteCallingConventionsAnalysis(Analysis):
                 return None, None, None, None, None
 
         # determine the calling convention of each function
-        cc_analysis = self.project.analyses[CallingConventionAnalysis].prep(kb=self.kb)(
-            func,
-            cfg=self._cfg,
-            analyze_callsites=self._analyze_callsites,
-            collect_facts=self.mode == CallingConventionAnalysisMode.FAST,
-        )
+        try:
+            cc_analysis = self.project.analyses[CallingConventionAnalysis].prep(kb=self.kb)(
+                func,
+                cfg=self._cfg,
+                analyze_callsites=self._analyze_callsites,
+                collect_facts=self.mode == CallingConventionAnalysisMode.FAST,
+            )
+        except Exception:
+            return None, None, None, None, self.kb.variables.get_function_manager(func_addr)
 
         if cc_analysis.cc is not None:
             _l.info("Determined calling convention and prototype for %r.", func)
