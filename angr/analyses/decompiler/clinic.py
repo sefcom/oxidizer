@@ -163,6 +163,7 @@ class Clinic(Analysis):
         arg_vvars: dict[int, tuple[ailment.Expr.VirtualVariable, SimVariable]] | None = None,
         start_stage: ClinicStage | None = ClinicStage.INITIALIZATION,
         notes: dict[str, DecompilationNote] | None = None,
+        flatten_args=False,
     ):
         if not func.normalized and mode == ClinicMode.DECOMPILE:
             raise ValueError("Decompilation must work on normalized function graphs.")
@@ -210,6 +211,7 @@ class Clinic(Analysis):
         self._typehoon_cls = typehoon_cls
 
         self.notes = notes if notes is not None else {}
+        self._flatten_args = flatten_args
 
         #
         # intermediate variables used during decompilation
@@ -1781,6 +1783,14 @@ class Clinic(Analysis):
                 else self.function.prototype
             )
             args: list[SimFunctionArgument] = self.function.calling_convention.arg_locs(proto)
+            if self._flatten_args:
+                new_args = []
+                for arg in args:
+                    if isinstance(arg, SimStructArg):
+                        new_args.extend(expand_argloc(arg))
+                    else:
+                        new_args.append(arg)
+                args = new_args
             arg_vars: list[SimVariable] = []
             if args:
                 arg_names = self.function.prototype.arg_names or [f"a{i}" for i in range(len(args))]
