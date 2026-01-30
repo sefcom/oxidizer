@@ -271,11 +271,7 @@ class VirtualVariableCategory(IntEnum):
 
 class VirtualVariable(Atom):
 
-    __slots__ = (
-        "category",
-        "oident",
-        "varid",
-    )
+    __slots__ = ("category", "oident", "varid", "reg_vvars")
 
     def __init__(
         self,
@@ -292,6 +288,8 @@ class VirtualVariable(Atom):
         self.category = category
         self.oident = oident
         self.bits = bits
+
+        self.reg_vvars = kwargs.get("reg_vvars", {})
 
     @property
     def size(self):

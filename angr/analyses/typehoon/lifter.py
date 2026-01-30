@@ -55,6 +55,8 @@ class TypeLifter:
     def lift(self, ty: SimType):
         handler = _mapping.get(type(ty), None)
         if handler is None:
+            if ty is None:
+                return BottomType()
             return BottomType(name=ty.label)
 
         return handler(self, ty)
