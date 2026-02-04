@@ -53,6 +53,7 @@ from .typeconsts import (
     Float32,
     Float64,
     Enum,
+    RustEnum,
 )
 from .variance import Variance
 from .dfa import DFAConstraintSolver, EmptyEpsilonNFAError
@@ -78,6 +79,7 @@ Float_ = Float()
 Float32_ = Float32()
 Float64_ = Float64()
 Enum_ = Enum()
+RustEnum_ = RustEnum()
 
 
 PRIMITIVE_TYPES = {
@@ -99,6 +101,7 @@ PRIMITIVE_TYPES = {
     Float32_,
     Float64_,
     Enum_,
+    RustEnum_,
 }
 
 
@@ -1665,6 +1668,8 @@ class SimpleSolver:
         if typevar in typevar_set:
             return True
         if isinstance(typevar, Struct) and Struct_ in typevar_set:
+            return True
+        if isinstance(typevar, RustEnum) and RustEnum_ in typevar_set:
             return True
         if isinstance(typevar, Enum) and Enum_ in typevar_set:
             return True
