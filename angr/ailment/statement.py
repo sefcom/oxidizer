@@ -557,13 +557,6 @@ class Call(Expression, Statement):
         else:
             self.bits = 0  # uhhhhhhhhhhhhhhhhhhh
 
-        from .expression import VirtualVariable
-
-        if args and isinstance(args[0], VirtualVariable) and args[0].was_stack and args[0].stack_offset == -1976:
-            import ipdb
-
-            ipdb.set_trace()
-
     def likes(self, other):
         return (
             type(other) is Call
