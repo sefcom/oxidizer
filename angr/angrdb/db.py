@@ -9,6 +9,7 @@ from sqlalchemy.exc import DatabaseError
 from sqlalchemy.pool import NullPool
 
 from angr.errors import AngrCorruptDBError, AngrIncompatibleDBError, AngrDBError
+from angr.procedures import SIM_PROCEDURES
 from angr.project import Project
 from .models import Base, DbInformation
 from .serializers import LoaderSerializer, KnowledgeBaseSerializer
@@ -169,6 +170,31 @@ class AngrDB:
             for kb in kbs:
                 KnowledgeBaseSerializer.dump(session, kb)
 
+            # Save rust binary metadata
+            if self.project.is_rust_binary:
+                self.save_info(session, "is_rust_binary", self.project.is_rust_binary)
+            if self.project.rustc_version is not None:
+                self.save_info(session, "rustc_version", self.project.rustc_version)
+            if self.project.rustc_optimization_level is not None:
+                self.save_info(session, "rustc_optimization_level", self.project.rustc_optimization_level)
+
+            # Save unresolvable target hook addresses so CFG edges can be resolved after load. CFGFast
+            # allocates pseudo-addresses for UnresolvableCallTarget/JumpTarget via get_pseudo_addr(),
+            # which are baked into CFG node/edge addresses. These addresses are not reproducible on a
+            # fresh loader, so we must save and restore them explicitly.
+            call_target_addrs = []
+            jump_target_addrs = []
+            for addr, proc in self.project._sim_procedures.items():
+                name = type(proc).__name__
+                if name == "UnresolvableCallTarget":
+                    call_target_addrs.append(str(addr))
+                elif name == "UnresolvableJumpTarget":
+                    jump_target_addrs.append(str(addr))
+            if call_target_addrs:
+                self.save_info(session, "unresolvable_call_target_addrs", ",".join(call_target_addrs))
+            if jump_target_addrs:
+                self.save_info(session, "unresolvable_jump_target_addrs", ",".join(jump_target_addrs))
+
             # Update the information
             self.update_dbinfo(session, extra_info=extra_info)
 
@@ -192,7 +218,29 @@ class AngrDB:
             # Load the loader
             loader = LoaderSerializer.load(session)
             # Create the project
-            proj = Project(loader)
+            is_rust_binary = self.get_info(session, "is_rust_binary")
+            rustc_version = self.get_info(session, "rustc_version")
+            rustc_optimization_level = self.get_info(session, "rustc_optimization_level")
+            proj = Project(
+                loader,
+                is_rust_binary=is_rust_binary,
+                rustc_version=rustc_version,
+                rustc_optimization_level=rustc_optimization_level,
+            )
+
+            # Restore unresolvable target hooks at the exact addresses used by the original CFGFast
+            # analysis. These addresses are embedded in CFG edges and must be hooked with the correct
+            # SimProcedure for Clinic's indirect call resolution to work.
+            call_addrs_str = self.get_info(session, "unresolvable_call_target_addrs")
+            if call_addrs_str:
+                for addr_str in call_addrs_str.split(","):
+                    addr = int(addr_str)
+                    proj.hook(addr, SIM_PROCEDURES["stubs"]["UnresolvableCallTarget"](), replace=True)
+            jump_addrs_str = self.get_info(session, "unresolvable_jump_target_addrs")
+            if jump_addrs_str:
+                for addr_str in jump_addrs_str.split(","):
+                    addr = int(addr_str)
+                    proj.hook(addr, SIM_PROCEDURES["stubs"]["UnresolvableJumpTarget"](), replace=True)
 
             if kb_names is None:
                 kb_names = ["global"]
