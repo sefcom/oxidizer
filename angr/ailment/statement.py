@@ -70,11 +70,6 @@ class Assignment(Statement):
         self.dst = dst
         self.src = src
 
-        if src is None:
-            import ipdb
-
-            ipdb.set_trace()
-
     def __eq__(self, other):
         return type(other) is Assignment and self.idx == other.idx and self.dst == other.dst and self.src == other.src
 
