@@ -37,6 +37,7 @@ dependencies = [
     "pypcode>=3.2.1,<4.0",
     "pyvex==9.2.197.dev0",
     "rich>=13.1.0",
+    "rust-demangler==1.0",
     "sortedcontainers",
     "sympy",
     "typing-extensions",
@@ -103,10 +104,10 @@ debug = false
 default-groups = ["dev", "extras"]
 
 [tool.uv.sources]
-archinfo = { git = "https://github.com/angr/archinfo.git", branch = "master" }
-pyvex = { git = "https://github.com/angr/pyvex.git", branch = "master" }
-cle = { git = "https://github.com/angr/cle.git", branch = "master" }
-claripy = { git = "https://github.com/angr/claripy.git", branch = "master" }
+archinfo = { git = "https://github.com/angr/archinfo.git", rev = "84ad167543028b32e170d3659650707b3866185c" }
+pyvex = { git = "https://github.com/angr/pyvex.git", rev = "3f92fece7147e91cea401e14a3936f20860a402e" }
+cle = { git = "https://github.com/angr/cle.git", rev = "ce3333d0e1e72936fdbb75eefd70299ead4fb998" }
+claripy = { git = "https://github.com/angr/claripy.git", rev = "8b890bb13fe743bfdbaae119062631db4f10047b" }
 
 [tool.black]
 line-length = 120
