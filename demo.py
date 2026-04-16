@@ -10,7 +10,9 @@ TARGET_ADDR = 0x455300
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--unstripped", action="store_true", help="Use unstripped FakeCrypt binary and skip RustSymbolRecovery")
+    parser.add_argument(
+        "--unstripped", action="store_true", help="Use unstripped FakeCrypt binary and skip RustSymbolRecovery"
+    )
     args = parser.parse_args()
 
     binary = "binaries/FakeCrypt" if args.unstripped else "binaries/FakeCrypt-stripped"

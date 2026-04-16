@@ -73,36 +73,6 @@ pip install --no-build-isolation -e .
 python demo.py
 ```
 
-### Oxidizer UI
-
-[Oxidizer UI](https://github.com/sefcom/oxidizer-ui) provides a GUI based on angr-management for interactive Rust decompilation.
-
-#### Local
-1. Install oxidizer-ui (requires a working Oxidizer installation):
-```bash
-pip install git+https://github.com/sefcom/oxidizer-ui.git
-```
-
-2. Launch the GUI:
-```bash
-angr-management [binary name]
-```
-
-#### Docker (macOS)
-Oxidizer UI is included in the Docker image. To run it on macOS via X11 forwarding:
-
-1. Install and configure [XQuartz](https://www.xquartz.org/):
-```bash
-brew install --cask xquartz
-```
-After installation, **log out and log back in** (or reboot). Then open XQuartz, go to **Preferences → Security**, and check **"Allow connections from network clients"**.
-
-2. Allow local X11 connections and run the container:
-```bash
-xhost +localhost
-docker run -it --rm -e DISPLAY=host.docker.internal:0 oxidizer angr-management [binary name]
-```
-
 ### Output
 ```rust
 fn sub_455300(a0: i64, a1: i64, a2: i64, a3: i64) -> u32 {
