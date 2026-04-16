@@ -54,7 +54,23 @@ docker build -t oxidizer .
 docker run -it --rm oxidizer python demo.py
 ```
 
-### Local Setup
+### Local Setup (uv, recommended)
+[uv](https://docs.astral.sh/uv/) installs the exact versions pinned in `uv.lock`, so every machine gets a byte-identical environment.
+
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and a Rust toolchain (needed by `setuptools-rust`).
+2. Clone and sync:
+```bash
+git clone https://github.com/sefcom/oxidizer.git
+cd oxidizer
+uv sync --frozen --no-default-groups
+```
+
+3. Run the demo on a stripped Rust binary:
+```bash
+uv run python demo.py
+```
+
+### Local Setup (pip)
 1. Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/sefcom/oxidizer.git
