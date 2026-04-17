@@ -15,7 +15,7 @@ Yibo Liu, Zion Leonahenahe Basque, Arvind S Raj, Chavin Udomwongsa, Chang Zhu, J
 ```bibtex
 @inproceedings{liu2026oxidizer,
   title={Oxidizer: Toward Concise and High-fidelity Rust Decompilation},
-  author={Liu, Yibo and Basque, Zion Leonahenahe and Raj, Arvind S. and Udomwongsa, Chavin and Zhu, Chang and Hu, Jie and Zhao, Changyu and Dong, Fangzhou and Doup{\'e}, Adam and Bao, Tiffany and Shoshitaishvili, Yan and Wang, Ruoyu},
+  author={Liu, Yibo and Basque, Zion Leonahenahe and Raj, Arvind S and Udomwongsa, Chavin and Zhu, Chang and Hu, Jie and Zhao, Changyu and Dong, Fangzhou and Doup{\'e}, Adam and Bao, Tiffany and Shoshitaishvili, Yan and Wang, Ruoyu},
   booktitle={2026 IEEE Symposium on Security and Privacy (SP)},
   year={2026},
   organization={IEEE}
