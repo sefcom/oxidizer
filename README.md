@@ -8,9 +8,9 @@ It is brought to you by [SEFCOM at Arizona State University](https://sefcom.asu.
 
 ## Publication
 
-**Oxidizer: Toward Concise and High-fidelity Rust Decompilation** [[PDF](https://raw.githubusercontent.com/bluesadi/bluesadi.github.io/main/assets/files/oxidizer.pdf)]
+**Oxidizer: Toward Concise and High-fidelity Rust Decompilation**
 Yibo Liu, Zion Leonahenahe Basque, Arvind S Raj, Chavin Udomwongsa, Chang Zhu, Jie Hu, Changyu Zhao, Fangzhou Dong, Adam Doupé, Tiffany Bao, Yan Shoshitaishvili, Ruoyu Wang
-*IEEE Symposium on Security and Privacy (S&P), 2026*. (To appear)
+*IEEE Symposium on Security and Privacy (S&P), 2026*. [[PDF](https://raw.githubusercontent.com/bluesadi/bluesadi.github.io/main/assets/files/oxidizer.pdf)] [[Link (To appear)]()]
 
 ```bibtex
 @inproceedings{liu2026oxidizer,
