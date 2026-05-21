@@ -4,7 +4,7 @@ Oxidizer is a Rust decompiler built on top of [angr](https://github.com/angr/ang
 Unlike existing C-oriented decompilers, Oxidizer is specifically designed to handle Rust's unique compilation patterns and recover high-level Rust abstractions such as enums, pattern matching, error propagation (`?` operator), and macros (`println!`, `format!`, `panic!`, etc.).
 It is brought to you by [SEFCOM at Arizona State University](https://sefcom.asu.edu).
 
-*We are working on merging Oxidizer to the master branch of [angr](https://github.com/angr/angr/pull/6283).*
+*We have merged Oxidizer into the master branch of [angr](https://github.com/angr/angr/pull/6283).*
 
 ## Publication
 
