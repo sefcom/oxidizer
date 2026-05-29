@@ -619,10 +619,15 @@ class FunctionHandler:
         if prototype.returnty is not None and not isinstance(prototype.returnty, SimTypeBottom):
             retval = cc.return_val(prototype.returnty)
             if retval is not None:
-                return {
-                    Atom.from_argument(footprint_arg, state.arch, full_reg=True)
-                    for footprint_arg in retval.get_footprint()
-                }
+                sp_value = state.get_one_value(Register(state.arch.sp_offset, state.arch.bytes), strip_annotations=True)
+                sp = state.get_stack_offset(sp_value) if sp_value is not None else None
+                atoms = set()
+                for footprint_arg in retval.get_footprint():
+                    try:
+                        atoms.add(Atom.from_argument(footprint_arg, state.arch, full_reg=True, sp=sp))
+                    except ValueError:
+                        continue
+                return atoms
         return set()
 
     @staticmethod
